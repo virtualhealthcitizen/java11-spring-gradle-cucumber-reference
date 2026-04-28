@@ -32,9 +32,6 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-
       - name: Verify authentication
         run: gcloud auth list
 
@@ -47,15 +44,15 @@ jobs:
     needs: authenticate
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY_JSON }}
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+#      - name: Set up Cloud SDK
+#        uses: google-github-actions/setup-gcloud@v2
 
       - name: Make create_dataset script executable
         run: chmod +x ./scripts/create_dataset.sh
@@ -75,15 +72,15 @@ jobs:
     needs: create-dataset
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY_JSON }}
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+#      - name: Set up Cloud SDK
+#        uses: google-github-actions/setup-gcloud@v2
 
       - name: Make create_table script executable
         run: chmod +x ./scripts/create_table.sh
@@ -100,7 +97,7 @@ jobs:
     needs: authenticate
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -140,17 +137,13 @@ jobs:
       - build-image
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Authenticate to Google Cloud
         id: auth
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY_JSON }}
-          token_format: access_token
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
 
       - name: Download Docker image artifact
         uses: actions/download-artifact@v4
