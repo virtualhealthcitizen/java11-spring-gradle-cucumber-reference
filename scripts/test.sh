@@ -34,14 +34,11 @@ sleep 1
 ./scripts/create_table.sh ${GCP_DEFAULT_USER_PROJECT_ID} ${GCP_DEFAULT_USER_DATASET} ${GCP_DEFAULT_USER_TABLE}
 docker build \
   --build-arg PROFILE=local \
-  --build-arg GCP_SA_KEY_PATH=${GCP_SA_KEY_PATH} \
-  --build-arg GCP_DEFAULT_USER_PROJECT_ID=${GCP_DEFAULT_USER_PROJECT_ID} \
-  --build-arg GCP_DEFAULT_USER_DATASET=${GCP_DEFAULT_USER_DATASET} \
-  --build-arg GCP_DEFAULT_USER_TABLE=${GCP_DEFAULT_USER_TABLE} \
   -t java11-spring-gradle-cucumber-reference .
 echo "Starting Cucumber tests! 🥒"
 docker run --rm \
   --env PROFILE=local \
+  --env GCP_SA_KEY_PATH=/root/.config/gcloud/sa-private-key.json \
   --env GCP_ADC_ACCESS_TOKEN="$(gcloud auth application-default print-access-token)" \
   -v $HOME/.config/gcloud:/root/.config/gcloud \
   -v $HOME/google-cloud-sdk:/root/google-cloud-sdk \
