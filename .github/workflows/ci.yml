@@ -21,14 +21,12 @@ jobs:
   authenticate:
     name: Authenticate with GCP
     runs-on: ubuntu-latest
-#    outputs:
-#      access_token: ${{ steps.auth.outputs.access_token }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
@@ -44,15 +42,12 @@ jobs:
     needs: authenticate
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
+        uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY_JSON }}
-
-#      - name: Set up Cloud SDK
-#        uses: google-github-actions/setup-gcloud@v2
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
       - name: Make create_dataset script executable
         run: chmod +x ./scripts/create_dataset.sh
@@ -72,15 +67,12 @@ jobs:
     needs: create-dataset
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
+        uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY_JSON }}
-
-#      - name: Set up Cloud SDK
-#        uses: google-github-actions/setup-gcloud@v2
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
       - name: Make create_table script executable
         run: chmod +x ./scripts/create_table.sh
@@ -97,7 +89,7 @@ jobs:
     needs: authenticate
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -110,10 +102,8 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:latest
           build-args: |
             PROFILE=${{ env.PROFILE }}
-          # Cache layers between runs to speed up builds
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          # Export image to Docker daemon so subsequent steps can use it
           load: true
 
       - name: Save Docker image as artifact
@@ -137,13 +127,12 @@ jobs:
       - build-image
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
-        id: auth
-        uses: google-github-actions/auth@v3
+        uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY_JSON }}
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
       - name: Download Docker image artifact
         uses: actions/download-artifact@v4
@@ -156,10 +145,9 @@ jobs:
       - name: Write GCP SA key to file
         run: |
           mkdir -p $HOME/.config/gcloud
-          echo '${{ secrets.GCP_SA_KEY_JSON }}' > $HOME/.config/gcloud/sa-private-key.json
+          echo '${{ secrets.GCLOUD_SERVICE_KEY }}' > $HOME/.config/gcloud/sa-private-key.json
 
       - name: Get ADC access token
-        id: token
         run: echo "ADC_TOKEN=$(gcloud auth application-default print-access-token)" >> $GITHUB_ENV
 
       - name: Run Cucumber tests in Docker container
@@ -183,7 +171,6 @@ jobs:
     name: Delete BigQuery Dataset
     runs-on: ubuntu-latest
     needs: run-tests
-    # Run cleanup even if run-tests fails so BQ resources aren't left dangling
     if: always()
     steps:
       - name: Checkout repository
@@ -192,10 +179,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY_JSON }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
       - name: Make delete_dataset script executable
         run: chmod +x ./scripts/delete_dataset.sh
