@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 chmod +x ./create_dataset.sh
 chmod +x ./delete_dataset.sh

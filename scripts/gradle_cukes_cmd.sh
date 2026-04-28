@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # Example usage:
 # ./scripts/gradle_cukes_cmd.sh
