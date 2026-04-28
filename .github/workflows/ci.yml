@@ -21,8 +21,8 @@ jobs:
   authenticate:
     name: Authenticate with GCP
     runs-on: ubuntu-latest
-    outputs:
-      access_token: ${{ steps.auth.outputs.access_token }}
+#    outputs:
+#      access_token: ${{ steps.auth.outputs.access_token }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
