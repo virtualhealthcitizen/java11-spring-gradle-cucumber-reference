@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ============================================================
+         Project Coordinates
+         ============================================================ -->
+    <groupId>org.squidmin.cucumber.skeleton</groupId>
+    <artifactId>java11-spring-gradle-cucumber-reference</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <!-- ============================================================
+         Spring Boot Parent (replaces Spring Boot + dependency-management plugins)
+         ============================================================ -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.10</version>
+        <relativePath/>
+    </parent>
+
+    <!-- ============================================================
+         Properties
+         ============================================================ -->
+    <properties>
+        <java.version>11</java.version>
+        <spring-cloud.version>2021.0.6</spring-cloud.version>
+        <cucumber.version>7.12.0</cucumber.version>
+        <junit.version>5.9.3</junit.version>
+        <lombok.version>1.18.12</lombok.version>
+        <google-cloud-bom.version>26.11.0</google-cloud-bom.version>
+        <bigquery.version>2.24.2</bigquery.version>
+        <snakeyaml.version>1.33</snakeyaml.version>
+    </properties>
+
+    <!-- ============================================================
+         Dependency Management (BOMs)
+         ============================================================ -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Cloud BOM -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Google Cloud Libraries BOM -->
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>${google-cloud-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- JUnit BOM -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Cucumber BOM -->
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-bom</artifactId>
+                <version>${cucumber.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- ============================================================
+         Dependencies
+         ============================================================ -->
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-context</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-jvm</artifactId>
+            <version>${cucumber.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-spring</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-bigquery</artifactId>
+            <version>${bigquery.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JUnit 4 (legacy) -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JUnit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Cucumber test dependencies -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!-- ============================================================
+         Build
+         ============================================================ -->
+    <build>
+        <plugins>
+
+            <!-- Spring Boot Maven Plugin (replaces bootJar / jar tasks) -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>org.squidmin.cucumber.skeleton.BddApplication</mainClass>
+                    <excludes>
+                        <!-- Exclude Lombok from the final fat jar -->
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Compiler Plugin — Java 11 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>2.7.10</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Surefire Plugin — replaces tasks.named('test') block -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Pass system properties into tests (equivalent to Gradle systemProperty calls) -->
+                    <systemPropertyVariables>
+                        <spring.profiles.active>${PROFILE}</spring.profiles.active>
+                        <GCP_SA_KEY_PATH>${GCP_SA_KEY_PATH}</GCP_SA_KEY_PATH>
+                        <GCP_ADC_ACCESS_TOKEN>${GCP_ADC_ACCESS_TOKEN}</GCP_ADC_ACCESS_TOKEN>
+                        <GCP_SA_ACCESS_TOKEN>${GCP_SA_ACCESS_TOKEN}</GCP_SA_ACCESS_TOKEN>
+                        <GCP_DEFAULT_USER_PROJECT_ID>${GCP_DEFAULT_USER_PROJECT_ID}</GCP_DEFAULT_USER_PROJECT_ID>
+                        <GCP_SA_PROJECT_ID>${GCP_SA_PROJECT_ID}</GCP_SA_PROJECT_ID>
+                        <GCP_DEFAULT_USER_DATASET>${GCP_DEFAULT_USER_DATASET}</GCP_DEFAULT_USER_DATASET>
+                        <GCP_SA_DATASET>${GCP_SA_DATASET}</GCP_SA_DATASET>
+                        <GCP_SA_USER_TABLE>${GCP_SA_USER_TABLE}</GCP_SA_USER_TABLE>
+                        <GCP_SA_TABLE>${GCP_SA_TABLE}</GCP_SA_TABLE>
+                        <!-- Disambiguates Cucumber scenario/example names, equivalent to Gradle workaround comment -->
+                        <cucumber.junit-platform.naming-strategy>long</cucumber.junit-platform.naming-strategy>
+                    </systemPropertyVariables>
+                    <!-- Enable JUnit Platform (JUnit 5) -->
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Exec Plugin — replaces the 'cukes' Gradle task -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>cukes</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>io.cucumber.core.cli.Main</mainClass>
+                    <arguments>
+                        <argument>--plugin</argument>
+                        <argument>pretty</argument>
+                        <argument>--plugin</argument>
+                        <argument>html:target/cucumber-report.html</argument>
+                        <argument>--glue</argument>
+                        <argument>org.squidmin.cucumber.skeleton</argument>
+                        <argument>src/test/resources/bdd</argument>
+                    </arguments>
+                    <systemProperties>
+                        <spring.profiles.active>${PROFILE}</spring.profiles.active>
+                        <GCP_SA_KEY_PATH>${GCP_SA_KEY_PATH}</GCP_SA_KEY_PATH>
+                        <GCP_ADC_ACCESS_TOKEN>${GCP_ADC_ACCESS_TOKEN}</GCP_ADC_ACCESS_TOKEN>
+                        <GCP_SA_ACCESS_TOKEN>${GCP_SA_ACCESS_TOKEN}</GCP_SA_ACCESS_TOKEN>
+                        <GCP_DEFAULT_USER_PROJECT_ID>${GCP_DEFAULT_USER_PROJECT_ID}</GCP_DEFAULT_USER_PROJECT_ID>
+                        <GCP_SA_PROJECT_ID>${GCP_SA_PROJECT_ID}</GCP_SA_PROJECT_ID>
+                        <GCP_DEFAULT_USER_DATASET>${GCP_DEFAULT_USER_DATASET}</GCP_DEFAULT_USER_DATASET>
+                        <GCP_SA_DATASET>${GCP_SA_DATASET}</GCP_SA_DATASET>
+                        <GCP_SA_USER_TABLE>${GCP_SA_USER_TABLE}</GCP_SA_USER_TABLE>
+                        <GCP_SA_TABLE>${GCP_SA_TABLE}</GCP_SA_TABLE>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

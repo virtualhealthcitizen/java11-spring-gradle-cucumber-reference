@@ -1,0 +1,191 @@
+name: Cucumber BDD Integration Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_DATASET: test_dataset_integration
+  GCP_TABLE: test_table_integration
+  IMAGE_NAME: java11-spring-gradle-cucumber-reference
+  PROFILE: local
+
+jobs:
+  # ============================================================
+  # JOB 1: Authenticate with GCP
+  # ============================================================
+  authenticate:
+    name: Authenticate with GCP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
+
+      - name: Verify authentication
+        run: gcloud auth list
+
+  # ============================================================
+  # JOB 2: Create BigQuery Dataset
+  # ============================================================
+  create-dataset:
+    name: Create BigQuery Dataset
+    runs-on: ubuntu-latest
+    needs: authenticate
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
+
+      - name: Make create_dataset script executable
+        run: chmod +x ./scripts/create_dataset.sh
+
+      - name: Create BigQuery dataset
+        run: ./scripts/create_dataset.sh ${{ env.GCP_PROJECT_ID }} ${{ env.GCP_DATASET }}
+
+      - name: Wait for dataset propagation
+        run: sleep 1
+
+  # ============================================================
+  # JOB 3: Create BigQuery Table
+  # ============================================================
+  create-table:
+    name: Create BigQuery Table
+    runs-on: ubuntu-latest
+    needs: create-dataset
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
+
+      - name: Make create_table script executable
+        run: chmod +x ./scripts/create_table.sh
+
+      - name: Create BigQuery table
+        run: ./scripts/create_table.sh ${{ env.GCP_PROJECT_ID }} ${{ env.GCP_DATASET }} ${{ env.GCP_TABLE }}
+
+  # ============================================================
+  # JOB 4: Build Docker Image
+  # ============================================================
+  build-image:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: authenticate
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:latest
+          build-args: |
+            PROFILE=${{ env.PROFILE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Save Docker image as artifact
+        run: docker save ${{ env.IMAGE_NAME }}:latest | gzip > image.tar.gz
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: image.tar.gz
+          retention-days: 1
+
+  # ============================================================
+  # JOB 5: Run Cucumber BDD Tests
+  # ============================================================
+  run-tests:
+    name: Run Cucumber BDD Tests
+    runs-on: ubuntu-latest
+    needs:
+      - create-table
+      - build-image
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
+
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker image
+        run: docker load < image.tar.gz
+
+      - name: Write GCP SA key to file
+        run: |
+          mkdir -p $HOME/.config/gcloud
+          echo '${{ secrets.GCLOUD_SERVICE_KEY }}' > $HOME/.config/gcloud/sa-private-key.json
+
+      - name: Get ADC access token
+        run: echo "ADC_TOKEN=$(gcloud auth application-default print-access-token)" >> $GITHUB_ENV
+
+      - name: Run Cucumber tests in Docker container
+        run: |
+          echo "Starting Cucumber tests! 🥒"
+          docker run --rm \
+            --env PROFILE=${{ env.PROFILE }} \
+            --env GCP_SA_KEY_PATH=/root/.config/gcloud/sa-private-key.json \
+            --env GCP_ADC_ACCESS_TOKEN="${{ env.ADC_TOKEN }}" \
+            -v $HOME/.config/gcloud:/root/.config/gcloud \
+            ${{ env.IMAGE_NAME }}:latest
+
+      - name: Wait after tests
+        run: sleep 1
+
+  # ============================================================
+  # JOB 6: Cleanup — Delete BigQuery Dataset
+  # Always runs, even if tests fail, to avoid leaving BQ resources dangling.
+  # ============================================================
+  cleanup:
+    name: Delete BigQuery Dataset
+    runs-on: ubuntu-latest
+    needs: run-tests
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
+
+      - name: Make delete_dataset script executable
+        run: chmod +x ./scripts/delete_dataset.sh
+
+      - name: Delete BigQuery dataset
+        run: ./scripts/delete_dataset.sh ${{ env.GCP_PROJECT_ID }} ${{ env.GCP_DATASET }}
+
+      - name: Done
+        run: echo "Done...."

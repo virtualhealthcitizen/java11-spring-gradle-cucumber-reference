@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 GCP_DEFAULT_USER_PROJECT_ID="$1"
 GCP_DEFAULT_USER_DATASET="$2"

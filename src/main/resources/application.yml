@@ -13,3 +13,7 @@ bigquery:
     table: ${bigquery.application-default.table}
   uri:
     queries: https://bigquery.googleapis.com/bigquery/v2/projects/${bigquery.application-default.project-id}/queries
+
+token-validator-service:
+  base-url: https://token-validator-service-5afqr6ijoq-uc.a.run.app/api
+  validator-endpoint: /validate-token

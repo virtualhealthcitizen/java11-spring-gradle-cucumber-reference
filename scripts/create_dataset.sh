@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # Example usage:
 # ./scripts/create_dataset.sh lofty-root-378503 test_dataset_integration
