@@ -1,3 +1,6 @@
+gcp:
+  sa-key-path: ${GCP_SA_KEY_PATH:}
+
 tables:
   default:
     schema:

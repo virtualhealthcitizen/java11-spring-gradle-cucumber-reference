@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestTemplate;
 import org.squidmin.cucumber.skeleton.service.BigQueryAdminClient;
+import org.squidmin.cucumber.skeleton.service.GcpTokenService;
+import org.squidmin.cucumber.skeleton.service.TokenValidatorClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +24,12 @@ public class SpringIntegrationTest {
 
     @Autowired
     protected BigQueryAdminClient bqAdminClient;
+
+    @Autowired
+    protected TokenValidatorClient tokenValidatorClient;
+
+    @Autowired
+    protected GcpTokenService gcpTokenService;
 
     protected ObjectMapper mapper = new ObjectMapper();
 
